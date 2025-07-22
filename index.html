@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<title>Quiz</title>
+<style>
+*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+user-select: none;
+}
+
+.home{
+width: 100%;
+height: auto;
+position: absolute;
+top: 45%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+
+.home button{
+width: 90%;
+height: auto;
+display: block;
+background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+background-size: 200% auto;
+border-radius: 10px;
+background-position: right center;
+text-decoration: none;
+color: white;
+border: none;
+outline: none;
+padding: 15px 15px;
+margin: 4% 0 4% 5%;
+border-radius: 6px;
+font-size: larger;
+font-weight: bold;
+cursor: pointer;
+box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+transition: background 0.3s ease;
+}
+
+#top {
+width: 100vw;
+height: auto;
+position: sticky;
+top: 0;
+display: flex;
+padding: 5% 0 5% 0;
+color: white;
+background-image: linear-gradient(to right, navy 0%, #0072ff 51%, navy 100%);
+background-size: 200% auto;
+background-position: left center;
+box-shadow: 1px 1px 4px rgba(0, 0, 0, .6);
+z-index: 3;
+}
+
+#top p {
+width: 100%;
+font-size: larger;
+font-weight: bold;
+margin-left: 5%;
+}
+</style>
+</head>
+<body>
+<div id="top">
+<p>Chameleon</p>
+</div><br />
+<div class="home" id="home">
+<button onclick="window.open('read.html','_self')">Reading</button>
+<button onclick="window.open('self test.html','_self')">Self Test</button>
+<button onclick="alert('Coming soon');">Join Test</button>
+<button onclick="alert('Coming soon');">Test History</button>
+</div>
+
+</body>
+</html>
