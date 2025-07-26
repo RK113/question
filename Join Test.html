@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<title>Join test</title>
+<style>
+html,
+body {
+  overscroll-behavior-y: contain;
+  touch-action: pan-x pan-y;
+  height: 100%;
+  overflow: hidden;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+form,.ans,#ia {
+display: none;
+}
+
+#top {
+width: 100vw;
+height: auto;
+position: sticky;
+top: 0;
+display: flex;
+padding: 2% 0 2% 0;
+background-color: white;
+box-shadow: 1px 1px 4px rgba(0, 0, 0, .6);
+z-index: 3;
+justify-content: center;
+font-weight: bold;
+font-size: x-large;
+}
+
+#Change {
+position: relative;
+width: 100%;
+height: auto;
+border-radius: 8px;
+}
+
+#Change button {
+position: sticky;
+bottom: 0;
+padding: 10px 20px;
+margin: 5px;
+font-weight: bold;
+cursor: pointer;
+}
+
+form {
+position: absolute;
+margin: 2px;
+margin-bottom: 20px;
+padding: 10px;
+font-size: 5.7vw;
+margin: auto;
+width: 100%;
+height: auto;
+top: 0;
+left: 0;
+box-sizing: border-box;
+transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+form p {
+display: flex;
+flex-direction: row;
+}
+
+form label {
+position: relative;
+width: 90%;
+display: inline-flex;
+flex-direction: row;
+margin-top: 3.5vw;
+border: 1px solid #999999;
+border-radius: 6px;
+background-color: white;
+color: #0d0d0d;
+padding: .7vw 0 .7vw 3vw;
+}
+
+form input[type="radio"] {
+position: relative;
+top: 2vw;
+width: 7vw;
+height: 7vw;
+accent-color: red;
+margin-top: 1vw;
+}
+
+#loader {
+display: flex;
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(255, 255, 255, 0.8);
+z-index: 99;
+justify-content: center;
+align-items: center;
+font-size: 24px;
+font-weight: bold;
+color: navy;
+}
+
+#bb {
+display: flex;
+width: 100%;
+height: auto;
+position: absolute;
+bottom: 2px;
+gap: 15px;
+justify-content: center;
+align-items: center;
+}
+
+#bb button {
+padding: 10px 15px;
+font-size: x-large;
+font-weight: 600;
+border: none;
+border-radius: 8px;
+background: linear-gradient(to bottom right, #2b2b2b, #000000);
+box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.3);
+color: white;
+}
+
+#mnb {
+display: flex;
+flex-wrap: wrap;
+gap: 2vw;
+height: 18vh;
+padding: 2vw;
+background: #f5f5f5;
+overflow-y: scroll;
+justify-content: flex-start;
+}
+
+#mnb p {
+display: flex;
+width: 9vw;
+height: 9vw;
+justify-content: center;
+align-items: center;
+text-align: center;
+font-size: larger;
+font-weight: bold;
+background: white;
+border: 1.5px solid #0072ff;
+background: linear-gradient(to bottom right, #00c6ff, #0072ff);
+color: white;
+border-radius: 6px;
+transition: all 0.2s ease-in-out;
+user-select: none;
+cursor: pointer;
+}
+
+#mnb p:hover {
+background-color: #0072ff;
+color: white;
+transform: scale(1.07);
+}
+
+#mnb p.answered {
+background: linear-gradient(to bottom right, #28a745, #218838);
+box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+color: white;
+border-color: #28a745;
+}
+
+::-webkit-scrollbar {
+width: 5vw;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+border: 1px solid #ddd;
+border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: red;
+border-radius: 5px;
+}
+
+/* Background overlay */
+.popup-overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: rgba(0, 0, 0, 0.5);
+display: none;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+}
+
+/* The popup box */
+.popup-box {
+background-color: #fefefe;
+padding: 25px 30px;
+border-radius: 10px;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+text-align: center;
+max-width: 350px;
+width: 90%;
+}
+
+.popup-box h2 {
+margin-top: 0;
+color: #333;
+}
+
+.popup-buttons {
+margin-top: 20px;
+display: flex;
+justify-content: center;
+gap: 25%;
+}
+
+.popup-buttons button {
+padding: 10px 18px;
+border: none;
+border-radius: 8px;
+font-size: 16px;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.popup-buttons .yes-btn {
+background-color: #28a745;
+color: white;
+}
+
+.popup-buttons .yes-btn:hover {
+background-color: #218838;
+}
+
+.popup-buttons .no-btn {
+background-color: #dc3545;
+color: white;
+}
+
+.popup-buttons .no-btn:hover {
+background-color: #c82333;
+}
+
+/* Fullscreen center */
+#codeBox {
+position: fixed;
+inset: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+background: linear-gradient(135deg, #e0f7fa, #ffffff);
+z-index: 999;
+}
+
+.code-container {
+background: white;
+padding: 30px 20px;
+border-radius: 16px;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+text-align: center;
+width: 90%;
+max-width: 320px;
+font-family: sans-serif;
+}
+
+.code-container h2 {
+margin-bottom: 20px;
+color: #0072ff;
+}
+
+.code-container input {
+padding: 10px;
+width: 100%;
+border-radius: 8px;
+border: 1px solid #ccc;
+font-size: 16px;
+outline: none;
+margin-bottom: 15px;
+box-sizing: border-box;
+}
+
+.code-container button {
+width: 100%;
+padding: 10px;
+background: linear-gradient(to right, #28a745, #218838);
+color: white;
+border: none;
+font-size: 16px;
+border-radius: 8px;
+cursor: pointer;
+transition: background 0.3s;
+}
+
+.code-container button:hover {
+background: linear-gradient(to right, #218838, #1e7e34);
+}
+
+.code-container p {
+margin-top: 10px;
+color: red;
+font-size: 14px;
+}
+</style>
+
+</head>
+
+<body>
+ <iframe id="ia"></iframe>
+<form id="k" name="k" target="ia">
+<input type="text" id="name0" name="name">
+<input type="text" id="tre" name="true">
+<input type="text" id="fae" name="false">
+<input type="text" id="na" name="na">
+<input type="text" id="tt" name="tt">
+<input type="text" id="dt" name="dt">
+<input type="text" id="question" name="question">
+<input type="text" id="answer" name="answer">
+<input type="submit" name="smt" id="smt">
+</form>
+
+<!-- Code Box -->
+<div id="codeBox">
+<div class="code-container">
+<h2>🔐 Enter Access Code and Name</h2>
+<input type="text" id="name" placeholder="Enter your name" />
+<input type="number" id="accessCode" placeholder="Enter code..." />
+<button onclick="checkCode()">Start</button>
+<p id="codeError"></p>
+</div>
+</div>
+
+<div id="mainApp" style="display:none;">
+<div id="top">
+<p>Time Left: <span id="timer">00:00:00</span></p>
+</div>
+<div id="mnb"></div><br />
+<br /><div id="Change" class="page"></div>
+<div id="bb">
+<br /><button onclick="prev()">Prev</button><button onclick="next()">Next</button>
+<button onclick="sub()">Submit</button>
+</div>
+<div id="loader">Loading...</div>
+<div class="popup-overlay" id="popup">
+<div class="popup-box">
+<h2>Are you sure you want to submit?</h2><br />
+<div class="popup-buttons">
+<button class="yes-btn" onclick="submitForm()">Yes</button>
+<button class="no-btn" onclick="closePopup()">No</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+const mcqIds = [];
+const already = {};
+let start = 1;
+let end = 100;
+let total = 50;
+let code = "error";
+
+let countdown;
+let timeLeft = 3600; // ⏱️ set to 1 hour (3600 seconds)
+
+function checkCode() {
+const enteredCode = document.getElementById("accessCode").value.trim();
+
+if (enteredCode == code) {
+document.getElementById("codeBox").style.display = "none";
+document.getElementById("mainApp").style.display = "block";
+loadSheetData();
+var userName = document.getElementById("name").value;
+saveUserName(userName);
+} else {
+document.getElementById("codeError").textContent = "❌ Incorrect code. Try again.";
+}
+}
+
+
+async function loadSettings() {
+const url = `https://docs.google.com/spreadsheets/d/1Et-kPikwO3r0tM9d1EcHnqs2VWOFhPHW2Dm77tTPg70/export?format=csv&gid=642147181`; // Use correct gid
+const res = await fetch(url);
+const text = await res.text();
+const rows = text.trim().split("\n").map(r => r.split(","));
+
+const settings = {};
+for (let [key, value] of rows) {
+settings[key.trim()] = parseInt(value.trim());
+}
+
+console.log("Loaded settings:", settings);
+return settings;
+}
+
+loadSettings().then(settings => {
+start = settings.start || 1;
+end = settings.end || 100;
+total = settings.total || 50;
+timeLeft = settings.time || 3600;
+code = settings.code || -153;
+
+prepareMcqs();
+for (let i = 1; i <= total; i++) {
+document.getElementById("mnb").innerHTML += `<p id="n${i}">${i}</p>`;
+if(i == total){
+document.getElementById("mnb").onclick = buton;
+}
+};
+});
+
+
+
+function prepareMcqs() {
+if (localStorage.getItem("savedQuestions")) {
+// ⏪ Load saved set
+mcqIds.push(...JSON.parse(localStorage.getItem("savedQuestions")));
+} else {
+for (let i = 0; i < total;) {
+const num = Math.floor(Math.random() * (end - start + 1)) + start;
+if (!already[num]) {
+already[num] = true;
+mcqIds.push(num);
+i++;
+if (num > end || num < start) {
+  console.warn("Invalid number:", num);
+}
+
+}
+}
+localStorage.setItem("savedQuestions", JSON.stringify(mcqIds));
+}
+}
+
+
+const sheetID = "1Et-kPikwO3r0tM9d1EcHnqs2VWOFhPHW2Dm77tTPg70"; // Replace with your sheet ID
+const gid = "0"; // First sheet
+
+async function loadSheetData() {
+document.getElementById("Change").innerHTML = "";
+showLoader();
+currentIndex = 0;
+const url = `https://docs.google.com/spreadsheets/d/${sheetID}/export?format=csv&gid=${gid}`;
+const res = await fetch(url);
+const text = await res.text();
+hideLoader();
+const rows = text.trim().split("\n").map(r => r.split(","));
+
+const headers = rows[0];
+const data = rows.slice(1);
+
+const qd = data.map(row => ({
+no: row[0],
+q: row[1],
+op1: row[2],
+op2: row[3],
+op3: row[4],
+op4: row[5],
+ans: row[6]
+}));
+
+const filtered = mcqIds.map(no => qd.find(q => parseInt(q.no) === no)).filter(Boolean);
+
+displayQuestions(filtered);
+}
+
+function displayQuestions(qd) {
+for (let i = 0; i < qd.length; i++) {
+document.getElementById("Change").innerHTML += `
+<form id="x${qd[i].no}">
+<p>(${i+1}) &nbsp;${qd[i].q}</p>
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}1">
+<label for="${qd[i].no}1">${qd[i].op1}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}2">
+<label for="${qd[i].no}2">${qd[i].op2}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}3">
+<label for="${qd[i].no}3">${qd[i].op3}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}4">
+<label for="${qd[i].no}4">${qd[i].op4}</label>
+
+<p class="ans" id="an${qd[i].no}">${qd[i].ans}</p></form>`;
+}
+
+if (qd.length > 0) {
+document.getElementById("x" + mcqIds[0]).style.display = "block";
+radio();
+restoreRadioIds();
+startCountdown();
+}
+}
+
+// slide to change
+let currentIndex = 0;
+let transitioning = false;
+
+function showSlide(newIndex) {
+if (newIndex < 0 || newIndex >= mcqIds.length || newIndex === currentIndex || transitioning) return;
+
+transitioning = true;
+
+const currentId = mcqIds[currentIndex];
+const nextId = mcqIds[newIndex];
+
+const currentEl = document.getElementById('x' + currentId);
+const nextEl = document.getElementById('x' + nextId);
+const direction = newIndex > currentIndex ? 1 : -1;
+
+// Reset nextEl
+nextEl.style.transition = 'none';
+nextEl.style.transform = `translateX(${100 * direction}%)`;
+nextEl.style.opacity = '0';
+nextEl.style.display = 'block';
+
+// Force reflow to apply initial state before transition
+nextEl.offsetWidth; // <- this line is CRUCIAL
+
+// Now apply transition
+nextEl.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+currentEl.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+
+// Start transitions
+currentEl.style.transform = `translateX(${-100 * direction}%)`;
+currentEl.style.opacity = '0';
+nextEl.style.transform = 'translateX(0)';
+nextEl.style.opacity = '1';
+
+// End transition cleanup
+setTimeout(() => {
+currentEl.style.display = 'none';
+currentEl.style.transform = 'translateX(0)';
+currentEl.style.opacity = '1';
+
+currentIndex = newIndex;
+transitioning = false;
+}, 400);
+}
+
+function next() {
+showSlide(currentIndex + 1);
+}
+
+function prev() {
+showSlide(currentIndex - 1);
+}
+
+//loader
+function showLoader() {
+document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader() {
+document.getElementById("loader").style.display = "none";
+}
+
+const container = document.getElementById("Change");
+let touchStartX = 0;
+let touchEndX = 0;
+
+container.addEventListener("touchstart", function(e) {
+touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+container.addEventListener("touchmove", function(e) {
+// Prevent vertical scroll when swiping horizontally
+const dx = e.changedTouches[0].screenX - touchStartX;
+if (Math.abs(dx) > 10) {
+e.preventDefault(); // stop page from scrolling
+}
+}, { passive: false });
+
+container.addEventListener("touchend", function(e) {
+touchEndX = e.changedTouches[0].screenX;
+handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+const dx = touchEndX - touchStartX;
+if (dx < -50) next(); // Swipe left
+if (dx > 50) prev(); // Swipe right
+}
+
+function startCountdown() {
+//clearInterval(countdown); // reset any existing timer
+//timeLeft = 3600; // ⏱️ set your desired time in seconds here
+
+countdown = setInterval(() => {
+if (timeLeft <= 0) {
+clearInterval(countdown);
+document.getElementById('timer').textContent = "00:00:00";
+alert("Time's up!");
+} else {
+timeLeft--;
+
+const hrs = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+const mins = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+const secs = String(timeLeft % 60).padStart(2, '0');
+
+document.getElementById('timer').textContent = `${hrs}:${mins}:${secs}`;
+}
+}, 1000);
+}
+
+const form = document.getElementById('myForm');
+const popup = document.getElementById('popup');
+
+ function sub() {
+popup.style.display = 'flex'; // show popup
+};
+
+function submitForm() {
+popup.style.display = 'none';
+sub0(); // actually submit
+}
+
+function closePopup() {
+popup.style.display = 'none';
+}
+
+function buton(e) {
+if (e.target.tagName == 'P') {
+const sn = parseInt(e.target.innerHTML);
+
+if (isNaN(sn) || sn < 1 || sn > mcqIds.length) {
+return;
+}
+const index = sn - 1;
+showSlide(index);
+}
+}
+
+function radio(){
+document.addEventListener("change", function (e) {
+if (e.target && e.target.type === "radio") {
+saveRadioId(e.target);
+}
+});
+}
+
+function saveRadioId(radio) {
+let saved = JSON.parse(localStorage.getItem("selectedRadios") || "[]");
+
+// Remove previous selection in same group
+saved = saved.filter(id => {
+const r = document.getElementById(id);
+return r && r.name !== radio.name;
+});
+
+// Add new selected radio ID
+saved.push(radio.id);
+localStorage.setItem("selectedRadios", JSON.stringify(saved));
+
+// ✅ Fix: calculate correct button ID
+const qnum = parseInt(radio.name);
+const index = mcqIds.indexOf(qnum);
+const numberEl = document.getElementById("n" + (index + 1));
+if (numberEl) {
+numberEl.classList.add("answered");
+}
+}
+
+
+function restoreRadioIds() {
+const saved = JSON.parse(localStorage.getItem("selectedRadios") || "[]");
+for (const id of saved) {
+const radio = document.getElementById(id);
+if (radio) {
+radio.checked = true;
+
+const qnum = radio.name;
+const numberEl = document.getElementById("n" + (mcqIds.indexOf(parseInt(qnum)) + 1));
+if (numberEl) {
+numberEl.classList.add("answered");
+}}}}
+
+function sub0() {
+ clearInterval(countdown);
+ let tre = 0;
+ let fae = 0;
+ let nta = mcqIds.length;
+ let datetime = "";
+ 
+ const q0 = document.getElementById("question");
+ const an_0 = document.getElementById("answer");
+ q0.value = "";
+ an_0.value = "";
+ 
+for (let i = 0; i < mcqIds.length; i++) {
+const questionName = mcqIds[i];
+const selector = `input[name="${questionName}"]:checked`;
+const selected = document.querySelector(selector);
+
+if (selected) {
+q0.value += questionName + "&#44;";
+an_0.value += selected.id + "&#44;";
+
+// Get label text (user's selected option)
+const label = document.querySelector(`label[for="${selected.id}"]`);
+const userAnswer = label ? label.innerHTML.trim() : "";
+
+// Get correct answer from <p id="anX">
+const correctAnswer = document.getElementById("an" + selected.name)?.innerHTML.trim() || "";
+
+if (userAnswer === correctAnswer) {
+tre++;
+} else {
+fae++;
+}
+
+nta--;
+
+// Uncheck after submission
+selected.checked = false;
+}
+ }
+ 
+ // After loop: Final submit
+ if (mcqIds.length === Number(total)) {
+const now = new Date();
+datetime = now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear() +
+" " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+
+
+// Fill final form data
+document.getElementById("name0").value = document.getElementById("name").value;
+
+document.getElementById("tre").value = tre;
+document.getElementById("fae").value = fae;
+document.getElementById("na").value = nta;
+document.getElementById("tt").value = document.getElementById('timer').textContent;
+document.getElementById("dt").value = datetime;
+
+document.getElementById("ia").src = "";
+document.getElementById("smt").click();
+document.getElementById("loader").style.display = "flex";
+
+ }
+}
+
+//send data to sheet
+const scriptURL = "https://script.google.com/macros/s/AKfycby6jJiEVLKguA3ZAs9rZ764AnAwh9UnKMGJa0VQuvcgNKDM7p4DbfPL6rN8X5Hu2LoxZA/exec";
+const form0 = document.forms["k"];
+form0.addEventListener("submit", (e) => {
+e.preventDefault();
+var formData = new FormData(form0);
+
+fetch(scriptURL, { method: "POST", body: formData })
+.then((response) => {
+var name = localStorage.getItem("userName");
+ localStorage.clear();
+ localStorage.setItem("userName", name);
+swal("Done", "Submitted Successfully.", "success");
+
+})
+.catch((error) => {
+swal("Error", "Something went wrong. please try again!", "error");
+});
+});
+
+
+function saveUserName(userName) {
+  const savedName = localStorage.getItem("userName");
+
+  if (!savedName || savedName !== userName) {
+    localStorage.setItem("userName", userName);
+    console.log("User name updated to:", userName);
+  } 
+}
+
+window.onload = function() {
+  const savedName = localStorage.getItem("userName");
+  if (savedName) {
+    document.getElementById("name").value = savedName;
+  }
+};
+
+history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    history.go(1);
+  };
+
+</script>
+</body>
+
+</html>
