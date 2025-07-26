@@ -1,1 +1,317 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History</title>
+<style>
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+input[type="radio"],.ans{
+display: none;
+}
+
+#loader {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(255, 255, 255, 0.8);
+z-index: 99;
+justify-content: center;
+align-items: center;
+font-size: 24px;
+font-weight: bold;
+color: navy;
+}
+
+#Change {
+position: relative;
+width: 100%;
+height: auto;
+background: linear-gradient(135deg, #e0f7fa, #ffffff);
+}
+
+form {
+position: static;
+margin: 2px;
+padding: 10px;
+font-size: 5.7vw;
+width: 100%;
+height: auto;
+top: 0;
+left: 0;
+transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+form p {
+margin: auto;
+display: flex;
+flex-direction: row;
+}
+
+form label {
+position: relative;
+width: 90%;
+display: inline-flex;
+flex-direction: row;
+margin-top: 3.5vw;
+border: 1px solid #999999;
+border-radius: 6px;
+background-color: white;
+color: #0d0d0d;
+padding: .7vw 0 .7vw 3vw;
+}
+
+hr{
+  width: 100vw;
+  height: auto;
+  border: 1px solid black;
+}
+
+#result {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 2% 2%;
+  background-color: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  justify-content: center;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  align-items: center;
+}
+
+#result p{
+  font-weight: bold;
+  font-size: large;
+}
+
+.container{
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+}
+
+.alert-box {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+transform: translate(-50%, -50%);
+  background: #fff;
+  border: 2px solid #28a745;
+  padding: 20px;
+  box-shadow: 0 0 10px #0004;
+  z-index: 9999;
+  border-radius: 10px;
+  text-align: center;
+  font-family: Arial;
+}
+.alert-box button {
+  margin-top: 10px;
+  padding: 5px 15px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.alert-box button:hover {
+  background-color: #218838;
+}
+
+</style>
+</head>
+<body>
+<div class="container" id="customAlert">
+  <div class="alert-box">
+  <p id="alertMessage">This is a custom alert!</p>
+  <button onclick="closeAlert()">OK</button>
+</div>
+</div>
+
+<div id="result">
+<p id="true"></p>
+<p id="false"></p>
+<p id="na"></p>
+<p id="tt"></p>
+</div>
+<div id="Change"></div>
+<div id="loader">Loading...</div>
+<script>
+let mcqIds = [];
+let rdId = [];
+const tsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxf8o9IkVgD1Io9gDaOHrY1e3f-zWu2k9BvZXhw5vTUruFRw5xdwUu6Yw4rmWOf2k-QJScdvd7ek7Q/pub?output=tsv'; // your published TSV link
+
+function searchCell() {
+const check = localStorage.getItem("userName");
+if(check){
+const inputValue = check.toLowerCase();
+
+fetch(tsvUrl).then(res => res.text()).then(data => {
+const rows = data.trim().split('\n').map(row => row.split('\t'));
+
+// 🔍 Match input with value in column 0 (change index if needed)
+const matchedRow = rows.find(row => row[0].toLowerCase() === inputValue);
+
+if (matchedRow) {
+// ✅ Load a specific cell, e.g. column 2
+const resultCell = matchedRow[6]; 
+const resultCell0 = matchedRow[7];
+// column index starts at 0
+
+document.getElementById('true').innerHTML = "True: " + matchedRow[1];
+document.getElementById('false').innerHTML = "False: " + matchedRow[2];
+document.getElementById('na').innerHTML = "Not Atempted: " + matchedRow[3];
+document.getElementById('tt').innerHTML = "Taken Time: " + matchedRow[4];
+
+mcqIds = resultCell.split("&#44;").map(Number); // now it's an array of numbers
+rdId = resultCell0.split("&#44;").map(Number); // now it's an array of numbers
+
+//console.log(mcqIds); // optional, to check
+loadSheetData();
+} else {
+document.getElementById('output').innerHTML = "❌ No match found.";
+}
+})
+.catch(error => {
+console.error("Error:", error);
+document.getElementById('output').innerHTML = "⚠️ Could not load data.";
+});
+}else{
+  showAlert("You have not attended any test");
+}}
+
+const sheetID = "1Et-kPikwO3r0tM9d1EcHnqs2VWOFhPHW2Dm77tTPg70"; // Replace with your sheet ID
+const gid = "0"; // First sheet
+
+async function loadSheetData() {
+document.getElementById("Change").innerHTML = "";
+showLoader();
+currentIndex = 0;
+const url = `https://docs.google.com/spreadsheets/d/${sheetID}/export?format=csv&gid=${gid}`;
+const res = await fetch(url);
+const text = await res.text();
+hideLoader();
+const rows = text.trim().split("\n").map(r => r.split(","));
+
+const headers = rows[0];
+const data = rows.slice(1);
+
+const qd = data.map(row => ({
+no: row[0],
+q: row[1],
+op1: row[2],
+op2: row[3],
+op3: row[4],
+op4: row[5],
+ans: row[6]
+}));
+
+const filtered = mcqIds.map(no => qd.find(q => parseInt(q.no) === no)).filter(Boolean);
+
+displayQuestions(filtered);
+}
+
+function displayQuestions(qd) {
+for (let i = 0; i < qd.length; i++) {
+document.getElementById("Change").innerHTML += `
+<form id="x${qd[i].no}">
+<p>(${i+1}) &nbsp;${qd[i].q}</p>
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}1">
+<label for="${qd[i].no}1">${qd[i].op1}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}2">
+<label for="${qd[i].no}2">${qd[i].op2}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}3">
+<label for="${qd[i].no}3">${qd[i].op3}</label><br />
+
+<input type="radio" name="${qd[i].no}" id="${qd[i].no}4">
+<label for="${qd[i].no}4">${qd[i].op4}</label><br />
+
+<p class="ans" id="an${qd[i].no}">${qd[i].ans}</p></form><hr />`;
+}
+
+if (qd.length > 0) {
+  radio();
+}
+}
+
+function showLoader() {
+document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader() {
+document.getElementById("loader").style.display = "none";
+}
+
+function radio() {
+const radios = document.querySelectorAll('input[type="radio"]');
+
+for (let i = 0; i < rdId.length-1; i++) {
+const selectedId = rdId[i];
+const qNo = String(selectedId).slice(0, -1); // question number
+
+const selectedLabel = document.querySelector(`label[for="${selectedId}"]`);
+const selectedText = selectedLabel ? selectedLabel.textContent.trim() : "";
+
+const correctAnswer = document.getElementById("an" + qNo)?.textContent.trim();
+
+//Reset all labels for this question
+document.querySelectorAll(`input[name="${qNo}"]`).forEach(input => {
+const lbl = document.querySelector(`label[for="${input.id}"]`);
+if(lbl) lbl.style.background = '';
+});
+
+//Highlight the correct answer in green
+document.querySelectorAll(`input[name="${qNo}"]`).forEach(input => {
+const lbl = document.querySelector(`label[for="${input.id}"]`);
+const labelText = lbl?.textContent.trim();
+
+if (labelText === correctAnswer) {
+lbl.style.background = 'green';
+lbl.style.color= 'white';
+
+}
+});
+
+//Highlight the selected one red if it's wrong
+if (selectedText !== correctAnswer) {
+selectedLabel.style.background= '#e60000';
+selectedLabel.style.color='white';
+}
+
+//Disable and uncheck all radios for this question
+document.querySelectorAll(`input[name="${qNo}"]`).forEach(input => {
+input.disabled = true;
+input.checked = false;
+});
+}
+}
+
+
+function showAlert(msg) {
+  document.getElementById("alertMessage").textContent = msg;
+  document.getElementById("customAlert").style.display = "block";
+}
+
+function closeAlert() {
+  history.back();
+}
+
+searchCell();
+</script>
+</body>
+</html>
